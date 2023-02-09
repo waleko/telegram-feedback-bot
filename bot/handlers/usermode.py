@@ -113,7 +113,7 @@ async def unsupported_types(message: Message, l10n: FluentLocalization):
         await message.reply(l10n.format_value("unsupported-message-type-error"))
 
 
-async def get_user_info(user: User) -> str:
+def get_user_info(user: User) -> str:
     """
     По пользователю возвращает, описывающую его строку
     """
