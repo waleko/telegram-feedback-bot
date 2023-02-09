@@ -1,0 +1,19 @@
+name: ci-docker
+on: push
+jobs:
+  build-push-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/waleko/telegram-feedback-bot
