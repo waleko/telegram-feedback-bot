@@ -2,7 +2,7 @@ from asyncio import create_task, sleep
 
 from aiogram import Router, F, Bot
 from aiogram.filters import Command
-from aiogram.types import ContentType
+from aiogram.types import ContentType, User
 from aiogram.types import Message
 from fluent.runtime import FluentLocalization
 
@@ -66,7 +66,7 @@ async def text_message(message: Message, bot: Bot, l10n: FluentLocalization):
     else:
         await bot.send_message(
             config.admin_chat_id,
-            message.html_text + f"\n\n#id{message.from_user.id}", parse_mode="HTML"
+            message.html_text + f"\n\n{get_user_info(message.from_user)}", parse_mode="HTML"
         )
         create_task(_send_expiring_notification(message, l10n))
 
@@ -89,7 +89,7 @@ async def supported_media(message: Message, l10n: FluentLocalization):
     else:
         await message.copy_to(
             config.admin_chat_id,
-            caption=((message.caption or "") + f"\n\n#id{message.from_user.id}"),
+            caption=((message.caption or "") + f"\n\n{get_user_info(message.from_user)}"),
             parse_mode="HTML"
         )
         create_task(_send_expiring_notification(message, l10n))
@@ -111,3 +111,10 @@ async def unsupported_types(message: Message, l10n: FluentLocalization):
             ContentType.SUCCESSFUL_PAYMENT, "proximity_alert_triggered",  # в 3.0.0b3 нет поддержка этого контент-тайпа
             ContentType.NEW_CHAT_TITLE, ContentType.PINNED_MESSAGE):
         await message.reply(l10n.format_value("unsupported-message-type-error"))
+
+
+async def get_user_info(user: User) -> str:
+    """
+    По пользователю возвращает, описывающую его строку
+    """
+    return f"{user.first_name} {user.last_name} @{user.username} #{user.id}"
